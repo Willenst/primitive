@@ -129,6 +129,28 @@ int get_tcp_server_sockfd(short port)
     return sockfd;
 }
 
+int get_udp_server_sockfd(short port)
+{
+    int sockfd;
+    struct sockaddr_in server_addr = {
+		.sin_family = AF_INET,
+        .sin_port = htons(port),
+		.sin_addr.s_addr = inet_addr("127.0.0.1")
+	};
+
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+        perror("socket$server");
+        exit(EXIT_FAILURE);
+    }
+
+    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+        perror("bind$server");
+        exit(EXIT_FAILURE);
+    }
+
+    return sockfd;
+}
+
 void populate_sockets()
 {
     struct sockaddr_in tcp_dst_addr = {
@@ -145,12 +167,19 @@ void populate_sockets()
         exit(EXIT_FAILURE);
     }
 
+    sendto_ipv4_udp_client_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sendto_ipv4_udp_client_sockfd == -1) {
+        perror("socket$udp");
+        exit(EXIT_FAILURE);
+    }
+
     sendto_ipv4_tcp_client_sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sendto_ipv4_tcp_client_sockfd == -1) {
         perror("socket$tcp");
         exit(EXIT_FAILURE);
     }
-
+    
+    sendto_ipv4_udp_server_sockfd = get_udp_server_sockfd(45173);
     sendto_ipv4_tcp_server_sockfd = get_tcp_server_sockfd(45174);
 
     connect(sendto_ipv4_tcp_client_sockfd, (struct sockaddr*)&tcp_dst_addr, sizeof(tcp_dst_addr));

@@ -16,27 +16,6 @@
 #include "env.h"
 #include "nftnl.h"
 
-
-void write_file(const char *filename, const char *buf, size_t buflen, unsigned int flags)
-{
-    int fd;
-
-    fd = open(filename, O_WRONLY | O_CREAT | flags, 0755);
-    if (fd < 0)
-    {
-        perror("open$write_file");
-        exit(EXIT_FAILURE);
-    }
-
-    if (write(fd, buf, buflen) != buflen)
-    {
-        perror("write$write_file");
-        exit(EXIT_FAILURE);
-    }
-
-    close(fd);
-}
-
 // https://stackoverflow.com/a/17997505
 static void bring_interface_up(const char *ifname)
 {
@@ -58,6 +37,50 @@ static void bring_interface_up(const char *ifname)
     close(sockfd);
 }
 
+void write_file(const char *filename, const char *buf, size_t buflen, unsigned int flags)
+{
+    int fd;
+
+    fd = open(filename, O_WRONLY | O_CREAT | flags, 0755);
+    if (fd < 0)
+    {
+        perror("open$write_file");
+        exit(EXIT_FAILURE);
+    }
+
+    if (write(fd, buf, buflen) != buflen)
+    {
+        perror("write$write_file");
+        exit(EXIT_FAILURE);
+    }
+
+    close(fd);
+}
+
+static void disable_rpf_by_ifname(const char *ifname)
+{
+    char rp_filter_path[PATH_MAX];
+
+    PRINTF_VERBOSE("[*] disabling rpf for interface: '%s'\n", ifname);
+
+    sprintf(rp_filter_path, "/proc/sys/net/ipv4/conf/%s/rp_filter", ifname);
+
+    write_file(rp_filter_path, "0\n", 2, 0);
+}
+
+static void disable_rpf_for_all()
+{
+    struct ifaddrs *addrs;
+
+    getifaddrs(&addrs);
+
+    for (struct ifaddrs *curr = addrs; curr != NULL; curr = curr->ifa_next)
+        if (curr->ifa_addr && curr->ifa_addr->sa_family == AF_PACKET)
+            disable_rpf_by_ifname(curr->ifa_name);
+
+    freeifaddrs(addrs);
+}
+
 static void configure_net_interfaces()
 {
 	printf("[*] configuring localhost in namespace...\n");
@@ -65,6 +88,11 @@ static void configure_net_interfaces()
     // kernelctf does not have the `ip` binary
     bring_interface_up("lo");
 
+    // assume echo is installed, and wildcards etc are supported
+    // disable RPF on all interfaces in network namespace
+    PRINTF_VERBOSE("[*] disabling RPF in network namespace...\n");
+    disable_rpf_for_all();
+	write_file("/proc/sys/net/ipv4/conf/all/rp_filter", "0\n", 2, 0);
 
 #if CONFIG_VERBOSE_
     system("ip addr");
