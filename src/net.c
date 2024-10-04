@@ -24,6 +24,7 @@ static int sendto_ipv4_ip_sockfd;
 static int sendto_ipv4_tcp_client_sockfd;
 static int sendto_ipv4_tcp_server_sockfd;
 static int sendto_ipv4_udp_server_sockfd;
+static int sendto_ipv4_udp_client_sockfd;
 static int sendto_ipv4_tcp_server_connection_sockfd;
 
 static void sendto_noconn(struct sockaddr_in *addr, const char* buf, size_t buflen, int sockfd)
@@ -33,6 +34,17 @@ static void sendto_noconn(struct sockaddr_in *addr, const char* buf, size_t bufl
 		perror("sendto");
 		exit(EXIT_FAILURE);
 	}
+}
+
+void send_ipv4_udp(const char* buf, size_t buflen)
+{
+    struct sockaddr_in dst_addr = {
+		.sin_family = AF_INET,
+        .sin_port = htons(45173),
+		.sin_addr.s_addr = inet_addr("127.0.0.1")
+	};
+
+	sendto_noconn(&dst_addr, buf, buflen, sendto_ipv4_udp_client_sockfd);
 }
 
 // code from https://android.googlesource.com/platform/system/core/+/refs/heads/main/libnetutils/packet.c#62
