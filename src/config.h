@@ -29,7 +29,7 @@
 // - increasing bulk amount increases time required to alloc all these PTEs
 // - this should be atleast a little more than the PCP order-0 freelist entries
 // - **bloated systems need more PTEs than stripped systems**
-#define CONFIG_PTE_SPRAY_AMOUNT 1600000  // default: high-ball for debian systems
+#define CONFIG_PTE_SPRAY_AMOUNT 16000  // default: high-ball for debian systems
 
 // amount of skb's sprayed on top of corrupted packet
 // - more is better, until it isn't
