@@ -1,4 +1,4 @@
-SRC_FILES := src/main.c src/env.c src/net.c src/nftnl.c
+SRC_FILES := src/main.c src/env.c src/net.c src/nftnl.c src/file.c
 OUT_NAME = ./exploit
 
 # use musl-gcc since statically linking glibc with gcc generated invalid opcodes for qemu

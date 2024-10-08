@@ -15,6 +15,7 @@
 
 #include "env.h"
 #include "nftnl.h"
+#include "file.h"
 
 // https://stackoverflow.com/a/17997505
 static void bring_interface_up(const char *ifname)
@@ -35,26 +36,6 @@ static void bring_interface_up(const char *ifname)
     ioctl(sockfd, SIOCSIFFLAGS, &ifr);
 
     close(sockfd);
-}
-
-void write_file(const char *filename, const char *buf, size_t buflen, unsigned int flags)
-{
-    int fd;
-
-    fd = open(filename, O_WRONLY | O_CREAT | flags, 0755);
-    if (fd < 0)
-    {
-        perror("open$write_file");
-        exit(EXIT_FAILURE);
-    }
-
-    if (write(fd, buf, buflen) != buflen)
-    {
-        perror("write$write_file");
-        exit(EXIT_FAILURE);
-    }
-
-    close(fd);
 }
 
 static void disable_rpf_by_ifname(const char *ifname)
@@ -160,4 +141,22 @@ void setup_env()
 	configure_uid_map(uid, gid);
 	configure_net_interfaces();
 	configure_nftables();
+}
+
+void setup_log(const char *filename)
+{
+	int log_fd;
+
+	printf("[*] piping stdout and stderr to file '%s'...\n", filename);
+	printf("[*] - caution! this means that exploit is not fileless\n");
+
+	log_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0755);
+	if (log_fd < 0)
+	{
+		printf("[!] failed to open log for writing\n");
+		exit(EXIT_FAILURE);
+	}
+
+	dup2(log_fd, STDOUT_FILENO);
+	dup2(log_fd, STDERR_FILENO);
 }

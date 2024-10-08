@@ -20,11 +20,12 @@
 #include "env.h"
 
 static char intermed_buf[1 << 19]; // simply pre-allocate intermediate buffers
+
 static int sendto_ipv4_ip_sockfd;
+static int sendto_ipv4_udp_client_sockfd;
+static int sendto_ipv4_udp_server_sockfd;
 static int sendto_ipv4_tcp_client_sockfd;
 static int sendto_ipv4_tcp_server_sockfd;
-static int sendto_ipv4_udp_server_sockfd;
-static int sendto_ipv4_udp_client_sockfd;
 static int sendto_ipv4_tcp_server_connection_sockfd;
 
 static void sendto_noconn(struct sockaddr_in *addr, const char* buf, size_t buflen, int sockfd)
@@ -34,17 +35,6 @@ static void sendto_noconn(struct sockaddr_in *addr, const char* buf, size_t bufl
 		perror("sendto");
 		exit(EXIT_FAILURE);
 	}
-}
-
-void send_ipv4_udp(const char* buf, size_t buflen)
-{
-    struct sockaddr_in dst_addr = {
-		.sin_family = AF_INET,
-        .sin_port = htons(45173),
-		.sin_addr.s_addr = inet_addr("127.0.0.1")
-	};
-
-	sendto_noconn(&dst_addr, buf, buflen, sendto_ipv4_udp_client_sockfd);
 }
 
 // code from https://android.googlesource.com/platform/system/core/+/refs/heads/main/libnetutils/packet.c#62
@@ -93,12 +83,56 @@ void send_ipv4_ip_hdr(const char* buf, size_t buflen, struct ip *ip_header)
 	sendto_noconn(&dst_addr, intermed_buf, ip_buflen, sendto_ipv4_ip_sockfd);
 }
 
+void send_ipv4_udp(const char* buf, size_t buflen)
+{
+    struct sockaddr_in dst_addr = {
+		.sin_family = AF_INET,
+        .sin_port = htons(45173),
+		.sin_addr.s_addr = inet_addr("127.0.0.1")
+	};
+
+	sendto_noconn(&dst_addr, buf, buflen, sendto_ipv4_udp_client_sockfd);
+}
+
+void send_ipv4_tcp(const char* buf, size_t buflen)
+{
+	send(sendto_ipv4_tcp_client_sockfd, buf, buflen, 0);
+}
+
 void recv_ipv4_udp(int content_len)
 {
     PRINTF_VERBOSE("[*] doing udp recv...\n");
     recv(sendto_ipv4_udp_server_sockfd, intermed_buf, content_len, 0);
 
 	PRINTF_VERBOSE("[*] udp packet preview: %02hhx\n", intermed_buf[0]);
+}
+
+void recv_ipv4_tcp()
+{
+    PRINTF_VERBOSE("[*] doing tcp recv...\n");
+    recv(sendto_ipv4_tcp_server_connection_sockfd, intermed_buf, sizeof(intermed_buf), 0);
+}
+
+int get_udp_server_sockfd(short port)
+{
+    int sockfd;
+    struct sockaddr_in server_addr = {
+		.sin_family = AF_INET,
+        .sin_port = htons(port),
+		.sin_addr.s_addr = inet_addr("127.0.0.1")
+	};
+
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+        perror("socket$server");
+        exit(EXIT_FAILURE);
+    }
+
+    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+        perror("bind$server");
+        exit(EXIT_FAILURE);
+    }
+
+    return sockfd;
 }
 
 int get_tcp_server_sockfd(short port)
@@ -124,28 +158,6 @@ int get_tcp_server_sockfd(short port)
     if ((listen(sockfd, 99)) != 0) { 
         printf("listen$tcp_server\n"); 
         exit(EXIT_FAILURE); 
-    }
-
-    return sockfd;
-}
-
-int get_udp_server_sockfd(short port)
-{
-    int sockfd;
-    struct sockaddr_in server_addr = {
-		.sin_family = AF_INET,
-        .sin_port = htons(port),
-		.sin_addr.s_addr = inet_addr("127.0.0.1")
-	};
-
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-        perror("socket$server");
-        exit(EXIT_FAILURE);
-    }
-
-    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
-        perror("bind$server");
-        exit(EXIT_FAILURE);
     }
 
     return sockfd;
