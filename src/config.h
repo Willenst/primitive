@@ -14,7 +14,7 @@
 // ==== actual config values for the exploit (DEVIATE AT WILL) ====
 
 #define CONFIG_REDIRECT_LOG 0  // redirect stdout and stderr to a logging file to prevent noise when over network
-#define CONFIG_VERBOSE_ 0  // extra log verbosity, handy for debugging
+#define CONFIG_VERBOSE_ 1  // extra log verbosity, handy for debugging
 #define CONFIG_LEET 0  // breaching le mainframe
 
 // amount of physical memory to scan for kernel bases
@@ -43,4 +43,4 @@
 // - this is useful since we do a lot of init allocations, and wait N seconds before continuing
 // - for some reason the success rate is higher without this lol, I guess you could leave it at 0
 //#define CONFIG_SEC_BEFORE_STORM 10 // (70/1000 fails)
-#define CONFIG_SEC_BEFORE_STORM 0 // (6/1000 fails)
+#define CONFIG_SEC_BEFORE_STORM 5 // (6/1000 fails)
