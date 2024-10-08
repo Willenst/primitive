@@ -36,7 +36,7 @@
 // - not enough skb's lead to kernel panic when kernel encounters corrupted packet in freelist when allocating skb's
 //#define CONFIG_SKB_SPRAY_AMOUNT 1 (12/32 fails)
 //#define CONFIG_SKB_SPRAY_AMOUNT 64 (4/32 fails)
-#define CONFIG_SKB_SPRAY_AMOUNT 5 // (0/651 fails)
+#define CONFIG_SKB_SPRAY_AMOUNT 1 // (0/651 fails)
 
 // only lower when flexing on people
 // - this wait period allows the kernel to make allocations in the background which aren't critical
