@@ -43,4 +43,4 @@
 // - this is useful since we do a lot of init allocations, and wait N seconds before continuing
 // - for some reason the success rate is higher without this lol, I guess you could leave it at 0
 //#define CONFIG_SEC_BEFORE_STORM 10 // (70/1000 fails)
-#define CONFIG_SEC_BEFORE_STORM 0 // (6/1000 fails)
+#define CONFIG_SEC_BEFORE_STORM 5 // (6/1000 fails)

