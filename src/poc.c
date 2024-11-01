@@ -14,8 +14,8 @@ void flush_cache() {
 }
 
 // You might need to configure these.
-#define SCORE_MEASURES 8
-#define PREFETCH_INTENSITY 50
+#define SCORE_MEASURES 80
+#define PREFETCH_INTENSITY 1
 #define ADDR 0xffffffffcafebabe
 
 

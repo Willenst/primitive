@@ -9,8 +9,8 @@ import statistics
 # 00000000
 # 0xffff8880
 
-start = 0xffffffffb8c00000
-end =   0xffffffffb9000000
+start = 0xffffffff92a00000
+end =   0xffffffff92c00000
 step =  0x0000000000100000
 
 threshold = 0.1
@@ -37,8 +37,8 @@ while addr <= end:
     addr += step
 
 for addr in addrs:
-    str_addr = hex(addr)[:-1]
-    count = 1000
+    str_addr = hex(addr)
+    count = 100
     rejected = False
     data=[]
     print()
