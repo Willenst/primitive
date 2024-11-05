@@ -14,7 +14,7 @@
 // ==== actual config values for the exploit (DEVIATE AT WILL) ====
 
 #define CONFIG_REDIRECT_LOG 0  // redirect stdout and stderr to a logging file to prevent noise when over network
-#define CONFIG_VERBOSE_ 0  // extra log verbosity, handy for debugging
+#define CONFIG_VERBOSE_ 1  // extra log verbosity, handy for debugging
 #define CONFIG_LEET 0  // breaching le mainframe
 
 // amount of physical memory to scan for kernel bases
