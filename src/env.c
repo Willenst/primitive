@@ -140,7 +140,7 @@ void setup_env()
 	do_unshare();
 	configure_uid_map(uid, gid);
 	configure_net_interfaces();
-	//configure_nftables();
+	configure_nftables();
 }
 
 void setup_log(const char *filename)
