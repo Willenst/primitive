@@ -356,7 +356,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 	//remove created rule just in case
 	unconfigure_nftables();
-
+	sleep(15);
 	// find overlapped PTE area
 	pte_area = NULL;
 	//printf("[*] SLEEP 1s before search...\n");
