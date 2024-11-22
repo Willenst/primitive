@@ -23,7 +23,7 @@
 // - make sure to account for mmio and stuff, considering laptops may utilize a lot of PCIe physical memory
 //   - as a rule of thumb, use 4GiB mmio, because scanning is quick and can't hurt to scan a larger area
 // - exploit may get stuck when kernel base is not found and phys mem is out of bounds, press ctrl-c (it is safe)
-#define CONFIG_PHYS_MEM (0x800000000 + 0x100000000)  // default: 32GiB system ram + 4GiB PCIe mmio and stuff
+#define CONFIG_PHYS_MEM (0x100000000 + 0x10000000)  // default: 32GiB system ram + 4GiB PCIe mmio and stuff
 
 // amount of PTE pages allocated (sprayed) when draining PCP order-0 freelist
 // - increasing bulk amount increases time required to alloc all these PTEs
@@ -43,4 +43,4 @@
 // - this is useful since we do a lot of init allocations, and wait N seconds before continuing
 // - for some reason the success rate is higher without this lol, I guess you could leave it at 0
 //#define CONFIG_SEC_BEFORE_STORM 10 // (70/1000 fails)
-#define CONFIG_SEC_BEFORE_STORM 0 // (6/1000 fails)
+#define CONFIG_SEC_BEFORE_STORM 2 // (6/1000 fails)
